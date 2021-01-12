@@ -15,6 +15,7 @@ public class ComparadorEstrellas implements Comparator<Star> {
 			return o1.getSpectralType().getSpectralNumber() - (o2.getSpectralType().getSpectralNumber());
 			
 		} else {
+			// COMPARE TO CON CLASES ENUMERADS
 			return o1.getSpectralType().getSpectralClass().compareTo(o2.getSpectralType().getSpectralClass());
 		}
 	}
