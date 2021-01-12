@@ -51,29 +51,36 @@ public class AstronomicViewer extends JFrame implements WindowListener {
 	private ConstellationInfoPanel constellationInfoPanel; // panel de información
 	private JLabel totalStarsInfo; // label con información del número de estrellas totales
 
+	// PANEL PARA LA TABLA
 	private JPanel panelContenedorTabla = new JPanel();
+	// VARIABLE PARA PODER USAR LA CLASE TABLAMAX
 	private TablaMax tm;
 
+	// OTRO JPANEL
 	private JPanel panelTabla = new JPanel();
-	
+
+	// BOOLEANS PARA:
+	// - VER LA TABLA DE TODAS LAS ESTRELLAS.
+	// - VER LA TABLA DE LAS ESTRELLAS VISIBLES.
+	// - ORDENAR LAS TABLAS.
 	private static boolean activarLaTablaDeEstrella = false;
 	private static boolean visible = false;
-	private static boolean ordenado = false;	
-	
-	private static boolean constelacionesOrdenar;
-	
+	private static boolean ordenado = false;
 
-	
+	private static boolean constelacionesOrdenar;
+
 	public AstronomicViewer() {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setSize(720, 480);
-		setTitle("Visor astron�mico");
+		setTitle("Visor astron�mico");
 
 		addWindowListener(this);
 
 		try {
 			dbManager = new DBManager();
 			dbManager.open();
+			
+			// CREA LA TABLA
 			tm = new TablaMax(dbManager);
 			panelContenedorTabla.setVisible(true);
 			panelContenedorTabla.setBorder(new LineBorder(Color.LIGHT_GRAY));
@@ -104,67 +111,73 @@ public class AstronomicViewer extends JFrame implements WindowListener {
 
 	}
 
+	// JMENUBAR DONDE SE INTEGRAN LAS COSAS
 	private void prepareMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
 		setJMenuBar(menuBar);
 
 		JMenu fileJMenu = new JMenu("Fichero");
 		menuBar.add(fileJMenu);
-		
-		
+
 		JMenu constelacionMenu = new JMenu("Constelacion");
 		menuBar.add(constelacionMenu);
-		
+
+		// ORDENAR LAS CONSTELACIONES
+		// ORDENAR POR ESTRELLAS
 		JMenuItem ordenarConstelaciones = new JMenuItem("Por Estrellas");
 		ordenarConstelaciones.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// CREA UN ARRAYLIST PARA AÑADIR LAS 
 				ArrayList<Constellation> nuevo = new ArrayList<>();
 
-				
+				// RECORRE LA LISTA DE CONSTELACIONES QUE HA CREADO UNAI (LA LISTA DE LA IZQUIERDA DE LA VENTANA)
 				for (int i = 0; i < constellationListModel.size(); i++) {
+					// AÑADE AL ARRAYLIST LA CONSTELACION
 					nuevo.add(constellationListModel.get(i));
 				}
 				
+				// USA EL COLLECTIONS.SORT PARA COMPARAR EL ARRAYLIST DE CONSTELACIONES (PRIMERA PARTE), CON EL COMPARADOR DE CANTIDAD.
 				Collections.sort(nuevo, new ComparadorConstelacionesCantidad());
 				
+				// VUELVE A CREAR LA LISTA D ELA IZQUIRDA ESTA VEZ ORDENADA.
 				for (int i = 0; i < constellationListModel.size(); i++) {
 					constellationListModel.set(i, nuevo.get(i));
 					validate();
 					repaint();
 				}
-				
+
 			}
 		});
 		constelacionMenu.add(ordenarConstelaciones);
 		
-		
+		// POR NOMBRE
+		// MISMO PROCEDIMIENTO QUE NATES (125-151)
 		JMenuItem ordenarConstelaciones2 = new JMenuItem("Por Nombre");
 		ordenarConstelaciones2.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				ArrayList<Constellation> nuevo = new ArrayList<>();
 
-				
 				for (int i = 0; i < constellationListModel.size(); i++) {
 					nuevo.add(constellationListModel.get(i));
 				}
-				
+
 				Collections.sort(nuevo, new ComparadorConstelacionesAlfabeto());
-				
+
 				for (int i = 0; i < constellationListModel.size(); i++) {
 					constellationListModel.set(i, nuevo.get(i));
 					validate();
 					repaint();
 				}
-				
+
 			}
 		});
 		constelacionMenu.add(ordenarConstelaciones2);
-	
 
+		// SALIR
 		JMenuItem exitItem = new JMenuItem("Salir");
 		fileJMenu.add(exitItem);
 
@@ -175,7 +188,9 @@ public class AstronomicViewer extends JFrame implements WindowListener {
 				exit();
 			}
 		});
-
+		
+		
+		// CREA LA TABLA DE ESTRELLAS
 		JMenu star = new JMenu("Stars");
 		menuBar.add(star);
 
@@ -184,14 +199,15 @@ public class AstronomicViewer extends JFrame implements WindowListener {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(!activarLaTablaDeEstrella) {
+				// SI EL BOOLEAN ACTIVARLATABLAESTRELLA == FALSE
+				if (!activarLaTablaDeEstrella) {
 					visible = false;
 					activarLaTablaDeEstrella = true;
+					// BORRA EL PANEL DE TABLA.
 					panelTabla.removeAll();
 					repaint();
 					validate();
 					JOptionPane.showMessageDialog(null, "Se ha activado la tabla de estrellas.");
-					
 
 				} else {
 					activarLaTablaDeEstrella = false;
@@ -201,27 +217,26 @@ public class AstronomicViewer extends JFrame implements WindowListener {
 					validate();
 					JOptionPane.showMessageDialog(null, "Se ha desactivado la tabla de estrellas.");
 				}
-				
-				
+
 			}
 		});
 		star.add(tablaStar);
 		
-		
+		// CREA LA TABLA DE ESTRELLAS VISIBLES
 		JMenuItem tablaStarVsible = new JMenuItem("Integrar estrellas visibles");
 		tablaStarVsible.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				
-				if(!visible) {
+
+				if (!visible) {
 					visible = true;
 					activarLaTablaDeEstrella = true;
 					panelTabla.removeAll();
 					repaint();
 					validate();
 					JOptionPane.showMessageDialog(null, "Se ha activado la tabla de estrellas visibles.");
-					
+
 				} else {
 					visible = false;
 					activarLaTablaDeEstrella = false;
@@ -230,29 +245,26 @@ public class AstronomicViewer extends JFrame implements WindowListener {
 					validate();
 					JOptionPane.showMessageDialog(null, "Tabla de estrellas inactiva.");
 				}
-				
-				
-				
+
 			}
 		});
 		star.add(tablaStarVsible);
-		
-		
+
 		JMenuItem ordenar = new JMenuItem("Ordenar");
 		ordenar.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(!ordenado) {
+				if (!ordenado) {
 					ordenado = true;
 					panelTabla.removeAll();
 					repaint();
 					validate();
 					JOptionPane.showMessageDialog(null, "Tyler te lo he ordenado.");
 				} else {
-					JOptionPane.showMessageDialog(null, "Ya est� ordenado joe Tyler que pesau <3");
+					JOptionPane.showMessageDialog(null, "Ya est� ordenado joe Tyler que pesau <3");
 				}
-				
+
 			}
 		});
 		star.add(ordenar);
@@ -300,17 +312,21 @@ public class AstronomicViewer extends JFrame implements WindowListener {
 		});
 	}
 
+	// AQUI SE CREAN LAS TABLAS
 	private void updateUI() {
 		if (constellationJList.getSelectedIndex() != -1) {
 			Constellation constellation = constellationJList.getSelectedValue();
 			
-			if(activarLaTablaDeEstrella && !visible) {
+			// AQUI CREA LA TABLA DE TODAS LAS ESTRELLAS
+			if (activarLaTablaDeEstrella && !visible) {
 				panelContenedorTabla.removeAll();
 				panelTabla = tm.panelTabla(constellation.getName(), false, ordenado);
 				panelContenedorTabla.add(panelTabla);
 				repaint();
 				validate();
-			} else if(activarLaTablaDeEstrella && visible) {
+			
+			// AQUI SE CREA LA TABLA DE LAS ESTRELLAS VISIBLES
+			} else if (activarLaTablaDeEstrella && visible) {
 				panelContenedorTabla.removeAll();
 				panelTabla = tm.panelTabla(constellation.getName(), true, ordenado);
 				panelContenedorTabla.add(panelTabla);
@@ -378,5 +394,5 @@ public class AstronomicViewer extends JFrame implements WindowListener {
 	@Override
 	public void windowOpened(WindowEvent arg0) {
 	}
-	
+
 }

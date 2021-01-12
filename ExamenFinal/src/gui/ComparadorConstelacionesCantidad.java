@@ -6,6 +6,7 @@ import astronomy.Constellation;
 
 public class ComparadorConstelacionesCantidad implements Comparator<Constellation> {
 
+	// COMPARA SEGUN LA CANTIDAD DE ESTRELLAS
 	@Override
 	public int compare(Constellation o1, Constellation o2) {
 		if(o1.getStars() == o2.getStars()) {
